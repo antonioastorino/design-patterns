@@ -1,22 +1,23 @@
 #include <print>
+#include <string_view>
+#include <source_location>
+#include <mutex>
+#include <format>
+#include <atomic>
+#include "logger.cpp"
 
 class LoggerOldSchool
 {
 private:
     static LoggerOldSchool* __instance;
-    LoggerOldSchool(void);
+    LoggerOldSchool(void) = default;
 
 public:
     static LoggerOldSchool* getInstance(void);
     void sayHello(void);
 };
 
-LoggerOldSchool::LoggerOldSchool(void)
-{
-}
-
 LoggerOldSchool* LoggerOldSchool::__instance = nullptr;
-
 LoggerOldSchool* LoggerOldSchool::getInstance(void)
 {
     if (LoggerOldSchool::__instance == nullptr)
@@ -25,55 +26,33 @@ LoggerOldSchool* LoggerOldSchool::getInstance(void)
     }
     return LoggerOldSchool::__instance;
 }
-
 void LoggerOldSchool::sayHello(void)
 {
     std::print("Hello from old-school logger\n");
 }
 
-/* Mayers singleton version
-The Meyers Singleton is a real object. It has a constructor, it can hold instance state in normal member variables, it can be passed around as a reference, and it has a controlled lifetime -it's constructed on first use and destroyed when the program exits.
-*/
-class Logger
-{
-private:
-    // Default constructor: private to restrict instantiation to within the class only (singleton pattern)
-    Logger() = default;
-
-public:
-    // Copy constructor: deleted to prevent copying the singleton instance
-    Logger(const Logger&) = delete;
-
-    // Copy assignment operator: deleted to prevent copy-assignment of the singleton instance
-    Logger& operator=(const Logger&) = delete;
-
-    // Move constructor: deleted to prevent moving the singleton instance
-    Logger(Logger&&) = delete;
-
-    // Move assignment operator: deleted to prevent move-assignment of the singleton instance
-    Logger& operator=(Logger&&) = delete;
-
-    static Logger& getInstance(void);
-    void sayHello(void);
-};
-
-Logger& Logger::getInstance(void)
-{
-    static Logger instance = Logger();
-    return instance;
-}
-
-void Logger::sayHello(void)
-{
-    std::print("Hello from Mayers Singleton logger");
-}
-
 int main(void)
 {
-    LoggerOldSchool* loggerOldSchool_p = LoggerOldSchool::getInstance();
-    Logger& logger                     = Logger::getInstance();
 
+    LoggerOldSchool* loggerOldSchool_p = LoggerOldSchool::getInstance();
     loggerOldSchool_p->sayHello();
+
+    Logger& logger = Logger::getInstance();
     logger.sayHello();
+
+    // Disable all logs
+    logger.setLogLevel(LogLevel::NO_LOGS);
+    logger.log(LogLevel::ERROR, "This will NOT print.");
+
+    // Enable only Errors and Warnings
+    logger.setLogLevel(LogLevel::WARNING);
+    logger.log(LogLevel::ERROR, "Critical Failure!"); // Prints
+    logger.log(LogLevel::INFO, "System start.");      // Ignored
+
+    logger.log(LogLevel::ERROR, "Basic log ERROR");
+
+    logger.setLogLevel(LogLevel::TRACE);
+    logger.log(LogLevel::INFO, "This should be printed");
+    logger.log(LogLevel::TRACE, "This should be printed");
     return 0;
 }

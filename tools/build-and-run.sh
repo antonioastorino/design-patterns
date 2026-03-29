@@ -10,7 +10,7 @@ if [ "$(uname -s)" = "Linux" ]; then
 fi
 
 echo "Formatting source code"
-clang-format -i --style=file:"${HOME}/config/.clang-format" src/*
+clang-format -i --style=file:"${HOME}/config/.clang-format" src/* include/*
 echo "Formatting done"
 
 rm -rf build/*
