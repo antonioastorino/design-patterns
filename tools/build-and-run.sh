@@ -4,7 +4,7 @@ set -eu
 setopt +o nomatch
 
 pushd $1
-FLAGS="-Wall -Wextra -Werror -std=c++23 -pedantic -fsanitize=address"
+FLAGS="-Wall -Wextra -Werror -std=c++23 -pedantic -fsanitize=address -O3"
 if [ "$(uname -s)" = "Linux" ]; then
     FLAGS="${FLAGS} -D_BSD_SOURCE -D_DEFAULT_SOURCE -D_GNU_SOURCE"
 fi
